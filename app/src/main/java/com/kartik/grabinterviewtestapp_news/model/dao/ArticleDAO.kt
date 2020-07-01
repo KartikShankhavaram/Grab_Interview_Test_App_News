@@ -1,7 +1,8 @@
-package com.kartik.grabinterviewtestapp_news
+package com.kartik.grabinterviewtestapp_news.model.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.kartik.grabinterviewtestapp_news.model.entities.Article
 
 @Dao
 interface ArticleDAO {
