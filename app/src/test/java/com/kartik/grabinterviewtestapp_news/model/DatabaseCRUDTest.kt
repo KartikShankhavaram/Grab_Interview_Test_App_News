@@ -33,7 +33,7 @@ class DatabaseCRUDTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
 
         // Setup Database
-        articleDatabase = Room.inMemoryDatabaseBuilder(context, ArticleDatabase::class.java).build()
+        articleDatabase = Room.inMemoryDatabaseBuilder(context, ArticleDatabase::class.java).allowMainThreadQueries().build()
         //Get DAO
         articleDAO = articleDatabase.articleDao()
     }
