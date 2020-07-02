@@ -23,18 +23,11 @@ class ArticleRepository(application: Application) {
         ).execute(article)
     }
 
-    fun updateArticle(article: Article) {
+    fun insertArticles(articles: List<Article>) {
         ArticleOperationAsyncTask(
             articleDAO,
-            UtilConstants.UPDATE_OPCODE
-        ).execute(article)
-    }
-
-    fun deleteArticle(article: Article) {
-        ArticleOperationAsyncTask(
-            articleDAO,
-            UtilConstants.DELETE_OPCODE
-        ).execute(article)
+            UtilConstants.INSERT_MULTIPLE_OPCODE
+        ).execute(*articles.toTypedArray())
     }
 
     fun clearCachedArticles() {
@@ -46,15 +39,14 @@ class ArticleRepository(application: Application) {
 
     fun getCachedArticles(): LiveData<List<Article>> = articles
 
-    private class ArticleOperationAsyncTask(val articleDAO: ArticleDAO, val opCode: Int): AsyncTask<Article, Unit, Unit>() {
+    private class ArticleOperationAsyncTask(val articleDAO: ArticleDAO, val opCode: Int) :
+        AsyncTask<Article, Unit, Unit>() {
         override fun doInBackground(vararg params: Article) {
-            when(opCode) {
+            when (opCode) {
                 UtilConstants.INSERT_OPCODE -> articleDAO.insertArticle(params[0])
-                UtilConstants.UPDATE_OPCODE -> articleDAO.updateArticle(params[0])
-                UtilConstants.DELETE_OPCODE -> articleDAO.deleteArticle(params[0])
+                UtilConstants.INSERT_MULTIPLE_OPCODE -> articleDAO.insertArticles(params.asList())
                 UtilConstants.CLEARCACHE_OPCODE -> articleDAO.clearCachedArticles()
             }
         }
     }
-
 }
