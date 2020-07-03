@@ -1,6 +1,6 @@
 package com.kartik.grabinterviewtestapp_news.utils
 
-import com.kartik.grabinterviewtestapp_news.model.entities.Article
+import com.kartik.grabinterviewtestapp_news.data.database.entities.Article
 
 class MockArticleGenerator {
     companion object {

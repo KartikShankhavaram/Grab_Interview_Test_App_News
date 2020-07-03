@@ -1,4 +1,4 @@
-package com.kartik.grabinterviewtestapp_news.model.entities
+package com.kartik.grabinterviewtestapp_news.data.database.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
