@@ -1,7 +1,6 @@
 package com.kartik.grabinterviewtestapp_news.data.network.api
 
 import android.content.Context
-import com.kartik.grabinterviewtestapp_news.BuildConfig
 import com.kartik.grabinterviewtestapp_news.R
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -17,7 +16,7 @@ class RetrofitClient {
                 val builder = OkHttpClient.Builder()
                 builder.addInterceptor { chain ->
                     val original = chain.request()
-                    val apiKey = BuildConfig.API_KEY
+                    val apiKey = mContext.resources.getString(R.string.api_key)
                     val requestBuilder = original.newBuilder().header("X-Api-Key", apiKey)
                     chain.proceed(requestBuilder.build())
                 }

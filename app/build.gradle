@@ -23,18 +23,6 @@ android {
     }
 
     buildTypes {
-        debug {
-            def systemEnvApiKey = System.getenv('API_KEY')
-            Properties properties = new Properties()
-            def propertiesFile = project.rootProject.file('local.properties')
-            if (propertiesFile.exists()) {
-                properties.load(propertiesFile.newDataInputStream())
-            }
-            def localPropertyApiKey = properties.getProperty('api.key')
-            def api_key = localPropertyApiKey != null ? localPropertyApiKey : systemEnvApiKey
-
-            buildConfigField "String", "API_KEY", "\"${api_key}\""
-        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
