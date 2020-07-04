@@ -1,10 +1,13 @@
 package com.kartik.grabinterviewtestapp_news.data.database.entities
 
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.android.parcel.Parcelize
 
 @Entity(tableName = "articles")
+@Parcelize
 data class Article(
     @PrimaryKey(autoGenerate = true) var id: Int?,
     @ColumnInfo(name = "source_id") var sourceId: String?,
@@ -16,7 +19,7 @@ data class Article(
     @ColumnInfo(name = "url_to_image") var urlToImage: String?,
     @ColumnInfo(name = "published_at") var publishedAt: String?,
     @ColumnInfo(name = "content") var content: String?
-) {
+) : Parcelable {
     constructor(
         sourceId: String?,
         sourceName: String?,

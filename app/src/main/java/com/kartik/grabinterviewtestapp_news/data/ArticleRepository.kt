@@ -4,6 +4,8 @@ import android.app.Application
 import android.os.AsyncTask
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.kartik.grabinterviewtestapp_news.data.database.ArticleDatabase
 import com.kartik.grabinterviewtestapp_news.data.database.dao.ArticleDAO
 import com.kartik.grabinterviewtestapp_news.data.database.entities.Article
@@ -19,8 +21,8 @@ class ArticleRepository(application: Application) {
     private var articleDAO: ArticleDAO
     private var articles: LiveData<List<Article>>
     private var newsAPIService: NewsAPIService
-    private var networkConnected: LiveData<Boolean>
-
+    private var networkConnected: Boolean = true
+    private var fetchingFromNetwork: MutableLiveData<Boolean>? = null
     private val TAG = "[Deb]ArticleRepository"
 
     init {
@@ -34,27 +36,35 @@ class ArticleRepository(application: Application) {
         newsAPIService = NewsAPIUtils.getNewsAPIService(application.applicationContext)
 
         NetworkUtils.init(application.applicationContext)
-        networkConnected = NetworkUtils.getNetworkStatus()
+        NetworkUtils.getNetworkStatus().observeForever {
+            networkConnected = it
+        }
     }
 
     fun getArticles(): LiveData<List<Article>> {
-        newsAPIService.getIndiaTopHeadlines().enqueue(object : Callback<ResponseModel.ArticleList> {
-            override fun onFailure(call: Call<ResponseModel.ArticleList>, t: Throwable) {
-                Log.d(TAG, "onFailure: ${t.localizedMessage}")
-            }
+        if(networkConnected) {
+            fetchingFromNetwork?.postValue(true)
+            newsAPIService.getIndiaTopHeadlines()
+                .enqueue(object : Callback<ResponseModel.ArticleList> {
+                    override fun onFailure(call: Call<ResponseModel.ArticleList>, t: Throwable) {
+                        Log.d(TAG, "onFailure: ${t.localizedMessage}")
+                        fetchingFromNetwork?.postValue(false)
+                    }
 
-            override fun onResponse(
-                call: Call<ResponseModel.ArticleList>,
-                response: Response<ResponseModel.ArticleList>
-            ) {
-                val body = response.body()
-                if (response.isSuccessful && body != null) {
-                    Log.d(TAG, "onResponse: $body")
-                    val dbList: List<Article> = transformNetworkResponseToRoom(body)
-                    setNewCachedArticles(dbList)
-                }
-            }
-        })
+                    override fun onResponse(
+                        call: Call<ResponseModel.ArticleList>,
+                        response: Response<ResponseModel.ArticleList>
+                    ) {
+                        val body = response.body()
+                        if (response.isSuccessful && body != null) {
+                            Log.d(TAG, "onResponse: $body")
+                            val dbList: List<Article> = transformNetworkResponseToRoom(body)
+                            setNewCachedArticles(dbList)
+                        }
+                        fetchingFromNetwork?.postValue(false)
+                    }
+                })
+        }
         return articles
     }
 
@@ -76,6 +86,10 @@ class ArticleRepository(application: Application) {
             )
         }
         return dbList
+    }
+
+    fun setFetchingFromNetworkLiveData(liveData: MutableLiveData<Boolean>) {
+        this.fetchingFromNetwork = liveData
     }
 
 //    private fun insertArticle(article: Article) {
