@@ -2,6 +2,7 @@ package com.kartik.grabinterviewtestapp_news.ui.fragments
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -129,8 +130,11 @@ class ArticleDescriptionFragment() : Fragment() {
                 }
 
             }
-            Glide.with(context).load(article.urlToImage).placeholder(R.drawable.placeholder).error(R.drawable.ic_broken_image)
-                .listener(listener).dontAnimate().into(rootView.newsThumbnail)
+            var glide = Glide.with(context).load(article.urlToImage).placeholder(R.drawable.placeholder).error(R.drawable.ic_broken_image)
+                .listener(listener).dontAnimate()
+            if(resources.configuration.orientation == ORIENTATION_LANDSCAPE)
+                glide = glide.centerCrop()
+            glide.into(rootView.newsThumbnail)
         }
         return rootView
     }
