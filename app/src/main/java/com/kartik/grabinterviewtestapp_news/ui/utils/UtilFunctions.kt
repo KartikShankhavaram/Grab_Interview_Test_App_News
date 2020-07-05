@@ -1,9 +1,13 @@
 package com.kartik.grabinterviewtestapp_news.ui.utils
 
+import android.content.Context
+import android.content.Intent
+import android.content.pm.ResolveInfo
 import android.text.format.DateUtils
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class UtilFunctions {
     companion object {
@@ -22,6 +26,18 @@ class UtilFunctions {
                 }
             }
             return ago
+        }
+
+        private const val SERVICE_ACTION =
+            "android.support.customtabs.action.CustomTabsService"
+        private const val CHROME_PACKAGE = "com.android.chrome"
+
+        fun isChromeCustomTabsSupported(context: Context): Boolean {
+            val serviceIntent = Intent()
+            serviceIntent.setPackage(CHROME_PACKAGE)
+            val resolveInfos: List<ResolveInfo> =
+                context.packageManager.queryIntentServices(serviceIntent, 0)
+            return !(resolveInfos == null || resolveInfos.isEmpty())
         }
     }
 }

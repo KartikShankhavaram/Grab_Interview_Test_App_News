@@ -1,4 +1,4 @@
-package com.kartik.grabinterviewtestapp_news.ui
+package com.kartik.grabinterviewtestapp_news.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
