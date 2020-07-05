@@ -5,7 +5,6 @@ import android.os.AsyncTask
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import com.kartik.grabinterviewtestapp_news.data.database.ArticleDatabase
 import com.kartik.grabinterviewtestapp_news.data.database.dao.ArticleDAO
 import com.kartik.grabinterviewtestapp_news.data.database.entities.Article
@@ -19,10 +18,10 @@ import retrofit2.Response
 
 class ArticleRepository(application: Application) {
     private var articleDAO: ArticleDAO
+    private var operationStatus: MutableLiveData<OperationStatus> = MutableLiveData()
     private var articles: LiveData<List<Article>>
     private var newsAPIService: NewsAPIService
     private var networkConnected: Boolean = true
-    private var fetchingFromNetwork: MutableLiveData<Boolean>? = null
     private val TAG = "[Deb]ArticleRepository"
 
     init {
@@ -32,23 +31,28 @@ class ArticleRepository(application: Application) {
             )
         articleDAO = articleDatabase.articleDao()
         articles = articleDAO.getCachedArticles()
-
         newsAPIService = NewsAPIUtils.getNewsAPIService(application.applicationContext)
 
-        NetworkUtils.init(application.applicationContext)
         NetworkUtils.getNetworkStatus().observeForever {
             networkConnected = it
         }
     }
 
+    fun getOperationStatus(): LiveData<OperationStatus> = operationStatus
+
     fun getArticles(): LiveData<List<Article>> {
-        if(networkConnected) {
-            fetchingFromNetwork?.postValue(true)
+        operationStatus.postValue(OperationStatus(null, true))
+        if (networkConnected) {
             newsAPIService.getIndiaTopHeadlines()
                 .enqueue(object : Callback<ResponseModel.ArticleList> {
                     override fun onFailure(call: Call<ResponseModel.ArticleList>, t: Throwable) {
                         Log.d(TAG, "onFailure: ${t.localizedMessage}")
-                        fetchingFromNetwork?.postValue(false)
+                        operationStatus.postValue(
+                            OperationStatus(
+                                NetworkResponseException("Could not fetch news"),
+                                false
+                            )
+                        )
                     }
 
                     override fun onResponse(
@@ -60,10 +64,24 @@ class ArticleRepository(application: Application) {
                             Log.d(TAG, "onResponse: $body")
                             val dbList: List<Article> = transformNetworkResponseToRoom(body)
                             setNewCachedArticles(dbList)
+                            operationStatus.postValue(OperationStatus(null, false))
+                        } else {
+                            operationStatus.postValue(
+                                OperationStatus(
+                                    NetworkResponseException("Error in fetching news"),
+                                    false
+                                )
+                            )
                         }
-                        fetchingFromNetwork?.postValue(false)
                     }
                 })
+        } else {
+            operationStatus.postValue(
+                OperationStatus(
+                    NoNetworkException("No network connection"),
+                    false
+                )
+            )
         }
         return articles
     }
@@ -86,10 +104,6 @@ class ArticleRepository(application: Application) {
             )
         }
         return dbList
-    }
-
-    fun setFetchingFromNetworkLiveData(liveData: MutableLiveData<Boolean>) {
-        this.fetchingFromNetwork = liveData
     }
 
 //    private fun insertArticle(article: Article) {
@@ -127,4 +141,10 @@ class ArticleRepository(application: Application) {
             articleDAO.setNewCachedArticles(params.asList())
         }
     }
+
+
 }
+
+data class OperationStatus(val t: Throwable?, val loading: Boolean) {}
+class NoNetworkException(val msg: String) : Exception(msg) {}
+class NetworkResponseException(val msg: String) : Exception(msg) {}

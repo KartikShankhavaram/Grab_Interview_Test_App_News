@@ -3,11 +3,9 @@ package com.kartik.grabinterviewtestapp_news.data.network.utils
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
-import android.net.NetworkRequest
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import java.lang.Exception
 
 class NetworkUtils {
     companion object {
@@ -16,7 +14,7 @@ class NetworkUtils {
         private const val TAG = "NetworkUtils"
 
         fun init(mContext: Context) {
-            if(!initialized) {
+            if (!initialized) {
                 val cm: ConnectivityManager =
                     mContext.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
@@ -34,12 +32,13 @@ class NetworkUtils {
                         }
                     }
                 )
+                networkConnected.postValue(cm.activeNetwork != null)
                 initialized = true
             }
         }
 
         fun getNetworkStatus(): LiveData<Boolean> {
-            if(initialized)
+            if (initialized)
                 return networkConnected
             else
                 throw InitNotCalledException("NetworkUtils has not been initialized with context.")

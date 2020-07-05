@@ -8,14 +8,18 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.kartik.grabinterviewtestapp_news.ui.fragments.ArticleListFragment
 import com.kartik.grabinterviewtestapp_news.R
 import com.kartik.grabinterviewtestapp_news.data.database.entities.Article
+import com.kartik.grabinterviewtestapp_news.ui.fragments.ArticleListFragment
 import com.kartik.grabinterviewtestapp_news.ui.utils.FragmentSwitcher
 import com.kartik.grabinterviewtestapp_news.ui.utils.UtilFunctions
 import kotlinx.android.synthetic.main.news_cardview.view.*
 
-class ArticleRecyclerViewAdapter(val context: Context?, val listener: FragmentSwitcher, val fragment: ArticleListFragment) :
+class ArticleRecyclerViewAdapter(
+    val context: Context?,
+    val listener: FragmentSwitcher,
+    val fragment: ArticleListFragment
+) :
     RecyclerView.Adapter<ArticleRecyclerViewAdapter.ArticleViewHolder>() {
 
     private var articles: List<Article> = arrayListOf()
@@ -40,7 +44,7 @@ class ArticleRecyclerViewAdapter(val context: Context?, val listener: FragmentSw
         private val inflater: LayoutInflater,
         private val parent: ViewGroup,
         val context: Context?,
-        val listener: FragmentSwitcher,
+        private val listener: FragmentSwitcher,
         val fragment: ArticleListFragment
     ) :
         RecyclerView.ViewHolder(inflater.inflate(R.layout.news_cardview, parent, false)) {
@@ -53,12 +57,17 @@ class ArticleRecyclerViewAdapter(val context: Context?, val listener: FragmentSw
 
 
         fun bind(article: Article) {
-            titleView.text = article.title
+            titleView.text = with(article.title) {
+                val l = this?.lastIndexOf("-")
+                val s = this?.substring(startIndex = 0, endIndex = l!!)
+                s?.trim()
+            }
             sourceView.text = article.sourceName
             timestampView.text = UtilFunctions.getRelativeTimeSpanString(article.publishedAt)
 //            val requestOptions = RequestOptions
             if (context != null)
-                Glide.with(context).load(article.urlToImage).into(newsImageView)
+                Glide.with(context).load(article.urlToImage).placeholder(R.drawable.placeholder)
+                    .error(R.drawable.ic_broken_image).into(newsImageView)
             articleItemView.setOnClickListener {
                 listener.switchFragment(article, itemView)
             }
