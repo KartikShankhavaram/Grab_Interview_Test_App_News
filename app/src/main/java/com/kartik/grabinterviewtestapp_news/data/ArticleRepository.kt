@@ -16,7 +16,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class ArticleRepository(application: Application) {
+class ArticleRepository(val application: Application) {
     private var articleDAO: ArticleDAO
     private var operationStatus: MutableLiveData<OperationStatus> = MutableLiveData()
     private var articles: LiveData<List<Article>>
@@ -106,43 +106,11 @@ class ArticleRepository(application: Application) {
         return dbList
     }
 
-//    private fun insertArticle(article: Article) {
-//        ArticleOperationAsyncTask(
-//            articleDAO,
-//            INSERT_OPCODE
-//        ).execute(article)
-//    }
-
     private fun setNewCachedArticles(articles: List<Article>) {
-        ArticleOperationAsyncTask(articleDAO).execute(*articles.toTypedArray())
-    }
-
-//    private fun insertArticles(articles: List<Article>) {
-////        ArticleOperationAsyncTask(
-////            articleDAO,
-////            INSERT_MULTIPLE_OPCODE
-////        ).execute(*articles.toTypedArray())
-////    }
-////
-////    private fun clearCachedArticles() {
-////        ArticleOperationAsyncTask(
-////            articleDAO,
-////            CLEARCACHE_OPCODE
-////        ).execute(null)
-////    }
-
-//    private fun getCachedArticles(): LiveData<List<Article>> = articles
-
-    private class ArticleOperationAsyncTask(
-        val articleDAO: ArticleDAO
-    ) :
-        AsyncTask<Article, Unit, Unit>() {
-        override fun doInBackground(vararg params: Article) {
-            articleDAO.setNewCachedArticles(params.asList())
+        Executor.IOThread {
+            articleDAO.setNewCachedArticles(articles)
         }
     }
-
-
 }
 
 data class OperationStatus(val t: Throwable?, val loading: Boolean) {}

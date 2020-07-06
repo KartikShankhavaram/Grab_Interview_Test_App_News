@@ -84,8 +84,8 @@ class ArticleDescriptionFragment() : Fragment() {
                 news_author.text = article.author
             else
                 news_author.visibility = View.GONE
-            if(article.desc == null) {
-                news_desc.text = "No description."
+            if(article.desc == null || article.desc == "null" || (article.desc as String).isEmpty()) {
+                news_desc.text = context.getString(R.string.no_description)
                 news_desc.setTypeface(news_desc.typeface, Typeface.ITALIC)
             }else {
                 news_desc.text = article.desc
