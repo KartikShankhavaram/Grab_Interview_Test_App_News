@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.kartik.grabinterviewtestapp_news.R
 import com.kartik.grabinterviewtestapp_news.data.database.entities.Article
 import com.kartik.grabinterviewtestapp_news.ui.fragments.ArticleListFragment
@@ -67,6 +68,7 @@ class ArticleRecyclerViewAdapter(
 //            val requestOptions = RequestOptions
             if (context != null)
                 Glide.with(context).load(article.urlToImage).placeholder(R.drawable.placeholder)
+                    .transition(DrawableTransitionOptions.withCrossFade())
                     .error(R.drawable.ic_broken_image).into(newsImageView)
             articleItemView.setOnClickListener {
                 listener.switchFragment(article, itemView)

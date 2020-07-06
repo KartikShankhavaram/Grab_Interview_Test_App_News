@@ -32,7 +32,7 @@ import com.kartik.grabinterviewtestapp_news.ui.activities.MainActivity
 import com.kartik.grabinterviewtestapp_news.ui.activities.WebViewActivity
 import com.kartik.grabinterviewtestapp_news.ui.utils.UtilFunctions
 import com.kartik.grabinterviewtestapp_news.viewmodel.ArticleViewModel
-import kotlinx.android.synthetic.main.article_desc_toolbar.view.*
+import kotlinx.android.synthetic.main.article_desc_toolbar_layout.view.*
 import kotlinx.android.synthetic.main.fragment_article_description.view.*
 
 class ArticleDescriptionFragment() : Fragment() {
@@ -84,10 +84,10 @@ class ArticleDescriptionFragment() : Fragment() {
                 news_author.text = article.author
             else
                 news_author.visibility = View.GONE
-            if(article.desc == null || article.desc == "null" || (article.desc as String).isEmpty()) {
+            if (article.desc == null || article.desc == "null" || (article.desc as String).isEmpty()) {
                 news_desc.text = context.getString(R.string.no_description)
                 news_desc.setTypeface(news_desc.typeface, Typeface.ITALIC)
-            }else {
+            } else {
                 news_desc.text = article.desc
             }
             news_time.text = UtilFunctions.getRelativeTimeSpanString(article.publishedAt)
@@ -101,6 +101,7 @@ class ArticleDescriptionFragment() : Fragment() {
                 } else {
                     val intent = Intent(context, WebViewActivity::class.java)
                     intent.putExtra("extra.url", article.url)
+                    intent.putExtra("extra.title", article.title)
                     startActivity(intent)
                 }
             }
@@ -130,9 +131,11 @@ class ArticleDescriptionFragment() : Fragment() {
                 }
 
             }
-            var glide = Glide.with(context).load(article.urlToImage).placeholder(R.drawable.placeholder).error(R.drawable.ic_broken_image)
-                .listener(listener).dontAnimate()
-            if(resources.configuration.orientation == ORIENTATION_LANDSCAPE)
+            var glide =
+                Glide.with(context).load(article.urlToImage).placeholder(R.drawable.placeholder)
+                    .error(R.drawable.ic_broken_image)
+                    .listener(listener).dontAnimate()
+            if (resources.configuration.orientation == ORIENTATION_LANDSCAPE)
                 glide = glide.centerCrop()
             glide.into(rootView.newsThumbnail)
         }
@@ -157,7 +160,7 @@ class ArticleDescriptionFragment() : Fragment() {
     }.build()
 
     fun setToolbarAttrs(inflater: LayoutInflater) {
-        val customToolbar = inflater.inflate(R.layout.article_desc_toolbar, null)
+        val customToolbar = inflater.inflate(R.layout.article_desc_toolbar_layout, null)
         val actionBar = (activity as MainActivity).supportActionBar
         actionBar?.apply {
             customView = customToolbar

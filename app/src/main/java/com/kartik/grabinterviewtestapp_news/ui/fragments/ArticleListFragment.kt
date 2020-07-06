@@ -50,7 +50,7 @@ class ArticleListFragment() : Fragment() {
             layoutManager = LinearLayoutManager(context)
             adapter = recyclerViewAdapter
         }
-        val customToolbar = inflater.inflate(R.layout.main_toolbar, null)
+        val customToolbar = inflater.inflate(R.layout.main_toolbar_layout, null)
         val actionBar = (activity as MainActivity).supportActionBar
         actionBar?.apply {
             customView = customToolbar
